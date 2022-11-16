@@ -1,0 +1,11 @@
+{% extends "judge/base.html" %}
+
+{% load i18n static %}
+
+{% block dark-mode-vars %}{% endblock %}
+
+{% block content %}
+    {% for contest in contest_list %}
+        {{ contest }}
+    {% endfor %}
+{% endblock %}

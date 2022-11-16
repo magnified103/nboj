@@ -1,0 +1,12 @@
+{% extends 'test_judge/contest_base.html' %}
+
+{% block content %}
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <h1 class="text-dark">Task: {{ task.name }}</h1>
+  </div>
+  <div class="content">
+    <embed src="{% url 'attachment' task.id task.statement_file %}" type="application/pdf" height="800" style="width: 70%">
+  </div>
+  <!-- /.content-header -->
+{% endblock %}

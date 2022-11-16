@@ -1,0 +1,202 @@
+{% extends 'test_judge/contest_base.html' %}
+
+{% block content %}
+  <div class="content-header">
+    <h1 class="text-dark">Submit</h1>
+  </div>
+  <div class="content">
+    <form action="" method="post">
+      {% csrf_token %}
+      <div class="card card-default">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Source</label>
+                {{ form.source }}
+                {% if form.source.errors %}
+                  {% for error in form.source.errors %}
+                    <span class="error">{{ error }}</span>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Task</label>
+                {{ form.task }}
+                {% if form.task.errors %}
+                  {% for error in form.task.errors %}
+                    <span class="error">{{ error }}</span>
+                  {% endfor %}
+                {% endif %}
+              </div>
+              <div class="form-group">
+                <label>Language</label>
+                {{ form.language }}
+                {% if form.language.errors %}
+                  {% for error in form.language.errors %}
+                    <span class="error">{{ error }}</span>
+                  {% endfor %}
+                {% endif %}
+              </div>
+              <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Submit">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap4-duallistbox/4.0.2/bootstrap-duallistbox.min.css" integrity="sha512-BcFCeKcQ0xb020bsj/ZtHYnUsvPh9jS8PNIdkmtVoWvPJRi2Ds9sFouAUBo0q8Bq0RA/RlIncn6JVYXFIw/iQA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  {{ form.media.css }}
+{% endblock %}
+
+{% block javascripts %}
+  {{ form.media.js }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap4-duallistbox/4.0.2/jquery.bootstrap-duallistbox.min.js" integrity="sha512-l/BJWUlogVoiA2Pxj3amAx2N7EW9Kv6ReWFKyJ2n6w7jAQsjXEyki2oEVsE6PuNluzS7MvlZoUydGrHMIg33lw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js" integrity="sha512-J+763o/bd3r9iW+gFEqTaeyi+uAphmzkE/zU8FxY6iAvD3nQKXa+ZAWkBI9QS9QkYEKddQoiy0I5GDxKf/ORBA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="text/javascript">
+      $(function () {
+          function format(state) {
+              if (!state.id) return state.text; // optgroup
+              return state.text;
+          }
+
+          window.previous_template = '';
+
+          function update_language_template() {
+              var source = $('textarea#id_source');
+              if (source.val() == window.previous_template.replace(/\r/g, '') || source.val() == '') {
+                  var lang_id = $('#id_language').val();
+                  var code = localStorage.getItem('submit:' + $('#id_language').val());
+
+                  function update_submit_area(code) {
+                      window.previous_template = code;
+                      source.val(code);
+                      window.ace_source.getSession().setValue(code);
+                  }
+
+                  if (code != null) {
+                      update_submit_area(code);
+                  } else {
+                      {# $.get('{{ url('language_template_ajax') }}', {#}
+                      {#    id: lang_id#}
+                      {# }).done(function (template) {#}
+                      {#     update_submit_area(template);#}
+                      {# });#}
+                  }
+              }
+          }
+
+          {# function makeDisplayData(data) {#}
+          {#     var site_data = data.attr('data-info');#}
+          {#     var judge_data = data.attr('data-judge-info');#}
+          {#     var display_data = site_data || judge_data;#}
+          {#     return display_data;#}
+          {# }#}
+          {# #}
+          {# function formatSelection(state) {#}
+          {#     if (!state.id) return state.text; // optgroup#}
+          {#     var data = makeDisplayData($("option[data-id=" + state.id + "]"));#}
+          {#     return $('<span>').append($('<b>').text(state.text), ' (', data, ')');#}
+          {# }#}
+
+          // Terrible hack, adapted from https://github.com/select2/select2/issues/4436
+          {# $.fn.select2.amd.define('select2/data/customAdapter', ['select2/results', 'select2/utils'], function (Result, Utils) {#}
+          {#     RefPresenter = function ($element, options, dataAdapter) {#}
+          {#         RefPresenter.__super__.constructor.call(this, $element, options, dataAdapter);#}
+          {#     };#}
+          {#     Utils.Extend(RefPresenter, Result);#}
+          {#     RefPresenter.prototype.bind = function (container, $container) {#}
+          {#         container.on('results:focus', function (params) {#}
+          {#             var data = makeDisplayData($("option[data-id=" + params.data.id + "]"));#}
+          {#             $("#result-version-info").text(data);#}
+          {#         });#}
+          {#         RefPresenter.__super__.bind.call(this, container, $container);#}
+          {#     };#}
+          {#     return RefPresenter;#}
+          {# });#}
+
+          {# var customAdapter = $.fn.select2.amd.require('select2/data/customAdapter');#}
+
+          {# $("#id_language").select2({#}
+          {#     templateResult: format,#}
+          {#     templateSelection: formatSelection,#}
+          {#     resultsAdapter: customAdapter#}
+          {# });#}
+
+          {# $('#id_language').on('select2:open', function (evt) {#}
+          {#     var dropdown = $('.select2-dropdown');#}
+          {#     if (!$('#result-version-info').length)#}
+          {#         dropdown.append($("<span id=\"result-version-info\">"));#}
+          {#     dropdown.attr('id', 'language-select2');#}
+          {# });#}
+
+          {# $('#id_judge').on('select2:open', function (evt) {#}
+          {#     var dropdown = $('.select2-dropdown');#}
+          {#     $('#result-version-info').remove();#}
+          {#     dropdown.attr('id', 'judge-select2');#}
+          {# });#}
+
+          $('#id_language').change(function () {
+              var lang = $("#id_language").find("option:selected").attr('data-ace');
+              window.ace_source.getSession().setMode("ace/mode/" + lang);
+              update_language_template();
+          });
+
+          $('#ace_source').on('ace_load', function (e, editor) {
+              update_language_template();
+              editor.commands.addCommand({
+                  name: 'save',
+                  bindKey: {win: 'Ctrl-S', mac: 'Command-S'},
+                  exec: function () {
+                      localStorage.setItem('submit:' + $('#id_language').val(), editor.getSession().getValue());
+                  }
+              });
+              editor.getSession().setUseWrapMode(true);
+              editor.setFontSize(14);
+              editor.setPrintMarginColumn(100);
+              editor.focus();
+          });
+
+          $(window).resize(function () {
+              $('#ace_source').height(Math.max($(window).height() - 353, 100));
+          }).resize();
+
+          {# $('#problem_submit').submit(function (event) {#}
+          {#     if ($('#id_source').val().length > 65536) {#}
+          {#         alert("{{ _('Your source code must contain at most 65536 characters.') }}");#}
+          {#         event.preventDefault();#}
+          {#         $('#problem_submit').find(':submit').attr('disabled', false);#}
+          {#     }#}
+          {# });#}
+      });
+  </script>
+  <script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+
+      //Bootstrap Duallistbox
+      $('.duallistbox').bootstrapDualListbox()
+
+      $("input[data-bootstrap-switch]").each(function(){
+        $(this).bootstrapSwitch('state', $(this).prop('checked'));
+      });
+
+    })
+  </script>
+{% endblock %}

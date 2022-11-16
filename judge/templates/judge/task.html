@@ -1,0 +1,42 @@
+{% extends "judge/base.html" %}
+{% load i18n static %}
+
+{% block dark-mode-vars %}{% endblock %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Judge portal</a></h1>
+{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "judge/task.css" %}">
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block content %}
+    <div class="statement">
+    <embed src="{% url 'attachment' task.id task.statement_file %}" type="application/pdf" height="1000" style="width: 100%">
+    </div>
+    <div class="sidebar-container">
+    <div class="contest-info-container">
+        <h1>{{ contest.name }}</h1>
+    </div>
+    <div class="task-info-container">
+        <h1>Task: {{ task.name }}</h1>
+        <hr style="background-color: var(--body-fg)">
+        <h2><a href="{% url 'submit' task.id %}">Submit</a></h2>
+{#        <h2><a href="{% url 'task-submissions' task.id %}">Your submissions</a></h2>#}
+    </div>
+    </div>
+{% endblock %}

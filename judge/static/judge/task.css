@@ -1,0 +1,24 @@
+.statement {
+    width: 100%;
+    padding: 40px 40px;
+}
+
+.sidebar-container {
+    width: 50%;
+    padding: 40px 40px;
+}
+
+.contest-info-container {
+    background: var(--darkened-bg);
+    padding: 10px 10px;
+    border: 1px solid var(--body-fg);
+    border-radius: 5px;
+}
+
+.task-info-container {
+    margin-top: 20px;
+    background: var(--darkened-bg);
+    padding: 10px 10px;
+    border: 1px solid var(--body-fg);
+    border-radius: 5px;
+}
