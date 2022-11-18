@@ -1,0 +1,60 @@
+{% extends 'judge/contest_base.html' %}
+
+{% block content %}
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <h1 class="text-dark">Contest: {{ contest.name }}</h1>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-4 text-left"><small>{{ contest.start_time | date:'M\/d\/Y H\:i\:s' }}</small></div>
+          <div id="contest-progress-status" class="col-4 text-center"></div>
+          <div class="col-4 text-right"><small>{{ contest.end_time | date:'M\/d\/Y H\:i\:s' }}</small></div>
+        </div>
+        <div class="progress" style="height: 25px">
+          <div id="contest-progress-bar" class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+            <span class="sr-only">25%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Description</h2>
+      </div>
+      <div class="card-body">
+        {{ contest.description }}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Tasks</h2>
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th style="width: 5%">#</th>
+              <th style="width: 70%">Task</th>
+              <th style="width: 10%">Your point</th>
+              <th style="width: 15%">No. of solves</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks %}
+              <tr style="cursor: pointer" onclick="location.href='{% url 'contest_task' contest.id task.index %}'">
+                <td>{{ task.index }}</td>
+                <td>{{ task.name }}</td>
+                <td>{{ task.my_points }}</td>
+                <td>{{ task.no_of_solves }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- /.content-header -->
+{% endblock %}

@@ -2,6 +2,7 @@ networks:
   net:
 volumes:
   problems:
+  db:
 
 services:
   phpmyadmin:
@@ -24,6 +25,8 @@ services:
       - net
     ports:
       - 3306:3306
+    volumes:
+      - db:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
       timeout: 20s

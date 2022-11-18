@@ -1,0 +1,113 @@
+{% extends "judge/base.html" %}
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} sidebar-mini layout-fixed sidebar-collapse {% endblock body_class %}
+
+{% block navbar %}
+  <ul class="navbar-nav">
+    <li class="navbar-item d-none d-sm-inline-block">
+      <a href="{% url 'contest' contest.id %}" class="nav-line">{{ contest.name }}</a>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block sidebar %}
+  <li class="nav-header">CONTEST</li>
+  <li class="nav-item">
+    <a href="{% url 'contest' contest.id %}" class="nav-link {% block nav_overview_class %}{% endblock %}">
+      <i class="nav-icon fa-solid fa-circle-info"></i>
+      <p>Overview</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'submit' contest.id %}" class="nav-link {% block nav_submit_class %}{% endblock %}">
+      <i class="nav-icon fa-solid fa-code"></i>
+      <p>Submit</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'submissions' contest.id %}" class="nav-link {% block nav_submissions_class %}{% endblock %}">
+      <i class="nav-icon fa-solid fa-list"></i>
+      <p>My submissions</p>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="{% url 'ranking' contest.id %}" class="nav-link {% block nav_ranking_class %}{% endblock %}">
+      <i class="nav-icon fa-solid fa-ranking-star"></i>
+      <p>Ranking</p>
+    </a>
+  </li>
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+      // the following timers are represented with precision to milliseconds
+      const initial_client_time = new Date().getTime();
+      const initial_server_time = {{ current_time | default_if_none:'null' }};
+      const start_time = {{ start_time | default_if_none:'null' }};
+      const end_time = {{ end_time | default_if_none:'null' }};
+
+      function getTime(milliseconds) {
+          let days = Math.floor(milliseconds / 86400000);
+          let hours = Math.floor((milliseconds - days * 86400000) / 3600000);
+          let minutes = Math.floor((milliseconds - days * 86400000 - hours * 3600000) / 60000);
+          let seconds = Math.floor((milliseconds - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000);
+          return [days, hours, minutes, seconds];
+      }
+
+      function getTimeStr(milliseconds) {
+          let [days, hours, minutes, seconds] = getTime(milliseconds);
+          if (hours < "10") {
+              hours = "0" + hours;
+          }
+			    if (minutes < "10") {
+              minutes = "0" + minutes;
+          }
+			    if (seconds < "10") {
+              seconds = "0" + seconds;
+          }
+          if (!days) {
+              return `${hours}:${minutes}:${seconds}`;
+          }
+          return `${days} days, ${hours}:${minutes}:${seconds}`;
+      }
+
+      function getStatus(current_server_time) {
+          if (start_time !== null && current_server_time < start_time) {
+              return `Contest starts in ${getTimeStr(start_time - current_server_time)}.`;
+          } else if (end_time === null) {
+              return "Contest is running.";
+          } else if (current_server_time < end_time) {
+              return `Contest ends in ${getTimeStr(end_time - current_server_time)}.`;
+          } else {
+              return "Contest is over.";
+          }
+      }
+
+      function getPercentage(current_server_time) {
+          if (start_time !== null && current_server_time < start_time) {
+              return 0;
+          } else if (end_time === null) {
+              return 50;
+          } else if (current_server_time < end_time) {
+              if (start_time === null) {
+                  return 50;
+              }
+              return Math.floor((current_server_time - start_time) / (end_time - start_time) * 100);
+          } else {
+              return 100;
+          }
+      }
+
+      setInterval(function func() {
+          let current_client_time = new Date().getTime()
+          let diff = current_client_time - initial_client_time;
+          let current_server_time = initial_server_time + diff;
+          let status = getStatus(current_server_time);
+          let percentage = getPercentage(current_server_time);
+          $("#contest-progress-status").html(status);
+          $("#contest-progress-bar").attr("style", `width: ${percentage}%`).attr("aria-valuenow", percentage);
+          return func;
+      }(), 1000);
+  </script>
+{% endblock %}

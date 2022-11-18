@@ -53,9 +53,12 @@ class Submission(models.Model):
     user = models.ForeignKey(User, verbose_name=_('user'), on_delete=models.CASCADE)
     source = models.TextField(verbose_name=_('source code'), max_length=65536)
     task = models.ForeignKey(Task, verbose_name=_('problem'), on_delete=models.CASCADE)
+    date = models.DateTimeField(verbose_name=_('submission time'), auto_now_add=True, db_index=True)
     time = models.FloatField(default=0, db_index=True)
     memory = models.FloatField(default=0)
     points = models.FloatField(default=0, db_index=True)
+    non_scaled_points = models.FloatField(default=0, db_index=True)
+    non_scaled_total = models.FloatField(default=0, db_index=True)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
     status = models.CharField(max_length=2, choices=STATUS, default='QU', db_index=True)
     result = models.CharField(max_length=3, choices=SUBMISSION_RESULT,

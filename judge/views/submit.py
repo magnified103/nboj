@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.views.generic import FormView
 
 from judge.forms import EditorForm
@@ -9,25 +10,30 @@ from judge.models import Contest, Language, Participation, Task
 
 
 class SubmitView(LoginRequiredMixin, UserPassesTestMixin, FormView):
-    template_name = 'test_judge/contest_submit.html'
+    template_name = 'judge/contest_submit.html'
     # template_name = 'judge/submit.html'
     form_class = EditorForm
 
+    @cached_property
+    def contest(self):
+        if 'contest_id' in self.kwargs:
+            return Contest.objects.get(id=self.kwargs['contest_id'])
+        if 'task_id' in self.kwargs:
+            return Task.objects.get(id=self.kwargs['task_id']).contest
+        raise Contest.DoesNotExist()
+
+    @cached_property
+    def user(self):
+        return self.request.user
+
     def test_func(self):
         try:
-            if 'contest_id' in self.kwargs:
-                contest = Contest.objects.get(id=self.kwargs['contest_id'])
-            elif 'task_id' in self.kwargs:
-                contest = Task.objects.get(id=self.kwargs['task_id']).contest
-            else:
-                return False
-            user = self.request.user
-            return Participation.objects.filter(contest=contest, user=user).count() > 0
+            return Participation.objects.filter(contest=self.contest, user=self.user).count() > 0
         except Exception:
             return False
 
     def get_success_url(self):
-        return reverse('contests')
+        return reverse('submissions', args=[self.contest.id])
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

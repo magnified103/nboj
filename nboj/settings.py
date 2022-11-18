@@ -132,6 +132,9 @@ AUTH_USER_MODEL = 'judge.User'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
+# Logout redirects
+LOGOUT_REDIRECT_URL = '/'
+
 # Bridged configuration
 BRIDGED_JUDGE_ADDRESS = [('', 9999)]
 BRIDGED_JUDGE_PROXIES = None

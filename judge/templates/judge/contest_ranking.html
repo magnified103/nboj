@@ -1,0 +1,88 @@
+{% extends 'judge/contest_base.html' %}
+
+{% block content %}
+  <div class="content-header">
+    <h1 class="text-dark">Ranking</h1>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-4 text-left"><small>{{ contest.start_time | date:'M\/d\/Y H\:i\:s' }}</small></div>
+          <div id="contest-progress-status" class="col-4 text-center"></div>
+          <div class="col-4 text-right"><small>{{ contest.end_time | date:'M\/d\/Y H\:i\:s' }}</small></div>
+        </div>
+        <div class="progress" style="height: 25px">
+          <div id="contest-progress-bar" class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+            <span class="sr-only">25%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm">
+            <thead>
+              <tr>
+                <th class="text-center" style="max-width: 10px">#</th>
+                <th>First name</th>
+                <th>Last name</th>
+                {% for task in tasks %}
+                  <th class="text-center" style="max-width: 12px">{{ task.index }}</th>
+                {% endfor %}
+                <th class="text-center" style="max-width: 12px">=</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+                <tr>
+                  <td class="text-center" style="max-width: 10px">{{ user.index }}</td>
+                  <td>{{ user.first_name }}</td>
+                  <td>{{ user.last_name }}</td>
+                  {% for point, level in user.points %}
+                    <td class="text-center" style="max-width: 12px; padding: 0"><div class="task-colored-score" data-color-level="{{ level }}">{{ point }}</div></td>
+                  {% endfor %}
+                  <td class="text-center" style="max-width: 12px; padding: 0"><div class="task-colored-score" data-color-level="{{ user.score_level }}">{{ user.score }}</div></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <style>
+     .task-colored-score {
+         border-radius: 6px;
+         margin: 1px
+    }
+  </style>
+{% endblock %}
+
+{% block javascripts %}
+  {{ block.super }}
+  <script>
+    const color_list = [
+        "#d71a1a",
+        "#d7461a",
+        "#d75c1a",
+        "#d76f1a",
+        "#d7851a",
+        "#d79b1a",
+        "#d7ab1a",
+        "#d7d41a",
+        "#b4d71a",
+        "#92d71a",
+        "#5fd71a",
+        "#1ad750",
+    ];
+    $(".task-colored-score").each(function() {
+       $(this).css("background-color", color_list[Number($(this).attr("data-color-level"))])
+    });
+  </script>
+{% endblock %}

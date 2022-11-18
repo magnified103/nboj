@@ -1,4 +1,4 @@
-{% extends 'test_judge/contest_base.html' %}
+{% extends 'judge/contest_base.html' %}
 
 {% block content %}
   <div class="content-header">
@@ -7,10 +7,10 @@
   <div class="content">
     <form action="" method="post">
       {% csrf_token %}
-      <div class="card card-default">
+      <div class="card">
         <div class="card-body">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-8">
               <div class="form-group">
                 <label>Source</label>
                 {{ form.source }}
@@ -21,7 +21,7 @@
                 {% endif %}
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-4">
               <div class="form-group">
                 <label>Task</label>
                 {{ form.task }}
@@ -56,9 +56,17 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap4-duallistbox/4.0.2/bootstrap-duallistbox.min.css" integrity="sha512-BcFCeKcQ0xb020bsj/ZtHYnUsvPh9jS8PNIdkmtVoWvPJRi2Ds9sFouAUBo0q8Bq0RA/RlIncn6JVYXFIw/iQA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   {{ form.media.css }}
+  <style>
+    [class^=django-ace-] {
+        box-sizing: content-box;
+        -moz-box-sizing: content-box;
+        -webkit-box-sizing: content-box;
+    }
+  </style>
 {% endblock %}
 
 {% block javascripts %}
+  {{ block.super }}
   {{ form.media.js }}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap4-duallistbox/4.0.2/jquery.bootstrap-duallistbox.min.js" integrity="sha512-l/BJWUlogVoiA2Pxj3amAx2N7EW9Kv6ReWFKyJ2n6w7jAQsjXEyki2oEVsE6PuNluzS7MvlZoUydGrHMIg33lw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -164,6 +172,7 @@
               editor.getSession().setUseWrapMode(true);
               editor.setFontSize(14);
               editor.setPrintMarginColumn(100);
+              editor.setOption('showPrintMargin', false)
               editor.focus();
           });
 

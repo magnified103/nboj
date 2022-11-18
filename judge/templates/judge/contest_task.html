@@ -1,0 +1,42 @@
+{% extends 'judge/contest_base.html' %}
+
+{% block content %}
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <h1 class="text-dark">Task: {{ task.name }}</h1>
+  </div>
+  <div class="content">
+    <div class="row">
+      <div class="col-8">
+        <embed src="{% url 'attachment' task.id task.statement_file %}" type="application/pdf" height="800" style="width: 100%">
+      </div>
+      <div class="col-4">
+        <div class="card">
+          <div class="card-header">
+            <h1 class="card-title">{{ contest.name }}</h1>
+          </div>
+          <div class="progress" style="height: 2px">
+            <div id="contest-progress-bar" class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+              <span class="sr-only">25%</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <p id="contest-progress-status"></p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h1 class="card-title">{{ task.name }}</h1>
+          </div>
+          <div class="card-body">
+            <p>Time limit: {{ task.time_limit }}s</p>
+            <p>Memory limit: {% widthratio task.memory_limit 1024 1 %} MiB</p>
+            <p><a href="{% url 'submit_task' task.id %}">Submit to this task.</a></p>
+            <p><a href="">Your submissions for this task.</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.content-header -->
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends 'judge/base.html' %}
+
+{% block body_class %} sidebar-mini layout-fixed sidebar-collapse {% endblock body_class %}
+
+{% block content %}
+  <div class="content-header">
+    <h1 class="text-dark">Dashboard</h1>
+  </div>
+  <div class="content">
+    {% if ongoing %}
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Ongoing contests</h2>
+        </div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Start</th>
+                <th>Length</th>
+                <th>Solved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for contest in ongoing %}
+                <tr style="cursor: pointer" onclick="location.href='{% url 'contest' contest.id %}'">
+                  <td>{{ contest.name }}</td>
+                  <td>{{ contest.start_time | date:'M\/d\/Y H\:i\:s' }}</td>
+                  <td class="contest-duration">{{ contest.duration }}</td>
+                  <td>{{ contest.tasks_solved }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+    {% if upcoming %}
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Upcoming contests</h2>
+        </div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Start</th>
+                <th>Length</th>
+                <th>Solved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for contest in upcoming %}
+                <tr style="cursor: pointer" onclick="location.href='{% url 'contest' contest.id %}'">
+                  <td>{{ contest.name }}</td>
+                  <td>{{ contest.start_time | date:'M\/d\/Y H\:i\:s' }}</td>
+                  <td class="contest-duration">{{ contest.duration }}</td>
+                  <td>{{ contest.tasks_solved }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+    {% if past %}
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Past contests</h2>
+        </div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Start</th>
+                <th>Length</th>
+                <th>Solved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for contest in past %}
+                <tr style="cursor: pointer" onclick="location.href='{% url 'contest' contest.id %}'">
+                  <td>{{ contest.name }}</td>
+                  <td>{{ contest.start_time | date:'M\/d\/Y H\:i\:s' }}</td>
+                  <td class="contest-duration">{{ contest.duration }}</td>
+                  <td>{{ contest.tasks_solved }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ super.block }}
+  <script>
+    function getTime(milliseconds) {
+        let days = Math.floor(milliseconds / 86400000);
+        let hours = Math.floor((milliseconds - days * 86400000) / 3600000);
+        let minutes = Math.floor((milliseconds - days * 86400000 - hours * 3600000) / 60000);
+        let seconds = Math.floor((milliseconds - days * 86400000 - hours * 3600000 - minutes * 60000) / 1000);
+        return [days, hours, minutes, seconds];
+    }
+
+    function getTimeStr(milliseconds) {
+        let [days, hours, minutes, seconds] = getTime(milliseconds);
+        if (seconds === 0 && minutes === 0) {
+            if (!days) {
+                return `${hours} hours`;
+            }
+            if (!hours) {
+                return `${days} days`;
+            }
+            return `${days} days, ${hours} hours`;
+        }
+        if (hours < "10") {
+            hours = "0" + hours;
+        }
+        if (minutes < "10") {
+            minutes = "0" + minutes;
+        }
+        if (seconds < "10") {
+            seconds = "0" + seconds;
+        }
+        if (!days) {
+            return `${hours}:${minutes}:${seconds}`;
+        }
+        return `${days} days, ${hours}:${minutes}:${seconds}`;
+    }
+    $(".contest-duration").each(function() {
+        if ($(this).html()) {
+            $(this).html(getTimeStr($(this).html()));
+        }
+    });
+  </script>
+{% endblock %}
