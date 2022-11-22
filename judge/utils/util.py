@@ -1,11 +1,14 @@
+from django.db import connection
 from django.db.models import Max
 
 from judge.models import Submission
 
 
 def get_best_score(user, task):
-    return Submission.objects.filter(
-        user=user, task=task).aggregate(Max('points', default=0))['points__max']
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT COALESCE(MAX(points), 0) FROM judge_submission '
+                       'WHERE (user_id = %s AND task_id = %s)', [user.id, task.id])
+        return cursor.fetchone()[0]
 
 
 def solved_task(user, task):

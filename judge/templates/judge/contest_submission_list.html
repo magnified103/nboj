@@ -13,13 +13,21 @@
               <thead>
                 <tr>
                   <th class="align-middle text-center" style="width: 8%">#</th>
-                  <th class="align-middle text-center" style="width: 12%">When</th>
+                  <th class="align-middle text-center" style="width: 12%">
+                    <span role="button" id="sort-date">When<i class="fa-solid fa-sort{% if order == 'BY_DATE_ASC' %}-up{% elif order == 'BY_DATE_DESC' %}-down{% endif %} ml-2"></i></span>
+                  </th>
                   <th class="align-middle" style="width: 30%">Task</th>
                   <th class="align-middle text-center" style="width: 10%">Language</th>
-                  <th class="align-middle text-center" style="width: 10%">Points</th>
+                  <th class="align-middle text-center" style="width: 10%">
+                    <span role="button" id="sort-point">Points<i class="fa-solid fa-sort{% if order == 'BY_POINT_ASC' %}-up{% elif order == 'BY_POINT_DESC' %}-down{% endif %} ml-2"></i></span>
+                  </th>
                   <th class="align-middle text-center" style="width: 10%">Status</th>
-                  <th class="align-middle text-center" style="width: 10%">Time</th>
-                  <th class="align-middle text-center" style="width: 10%">Memory</th>
+                  <th class="align-middle text-center" style="width: 10%">
+                    <span role="button" id="sort-time">Time<i class="fa-solid fa-sort{% if order == 'BY_TIME_ASC' %}-up{% elif order == 'BY_TIME_DESC' %}-down{% endif %} ml-2"></i></span>
+                  </th>
+                  <th class="align-middle text-center" style="width: 10%">
+                    <span role="button" id="sort-memory">Memory<i class="fa-solid fa-sort{% if order == 'BY_MEMORY_ASC' %}-up{% elif order == 'BY_MEMORY_DESC' %}-down{% endif %} ml-2"></i></span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -75,7 +83,138 @@
             <p id="contest-progress-status"></p>
           </div>
         </div>
+        <div class="card">
+          <div class="card-header">
+            <h1 class="card-title"><i class="fa-solid fa-filter"></i> Filters</h1>
+          </div>
+          <div class="card-body">
+            <div class="input-group mb-2">
+              <label for="filter-task" class="control-label">Task</label>
+{#              <select id="filter-task" class="form-control input-sm w-100">#}
+{#                <option value selected>---------</option>#}
+{#                {% for index, name in submission_tasks %}#}
+{#                  <option value="{{ index }}">{{ name }}</option>#}
+{#                {% endfor %}#}
+{#              </select>#}
+              {{ filter_form.task_filter }}
+            </div>
+            <div class="input-group mb-2">
+              <label for="filter-language" class="control-label">Language</label>
+{#              <select id="filter-language" class="form-control input-sm w-100">#}
+{#                <option value selected>---------</option>#}
+{#                {% for key, name in submission_languages %}#}
+{#                  <option value="{{ key }}">{{ name }}</option>#}
+{#                {% endfor %}#}
+{#              </select>#}
+              {{ filter_form.language_filter }}
+            </div>
+            <div class="input-group mb-3">
+              <label for="filter-status" class="control-label">Status</label>
+{#              <select id="filter-status" class="form-control input-sm w-100">#}
+{#                <option value selected>---------</option>#}
+{#                {% for status in submission_status %}#}
+{#                  <option value="{{ status }}">{{ status }}</option>#}
+{#                {% endfor %}#}
+{#              </select>#}
+              {{ filter_form.status_filter }}
+            </div>
+            <div class="input-group">
+              <input id="submit" type="button" class="btn btn-primary" value="Submit">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
+{% endblock %}
+
+{% block javascripts %}
+  {{ block.super }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js" integrity="sha512-RtZU3AyMVArmHLiW0suEZ9McadTdegwbgtiQl5Qqo9kunkVg1ofwueXD8/8wv3Af8jkME3DDe3yLfR8HSJfT2g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    $(function () {
+        $("select").select2({
+            theme: "bootstrap4",
+        });
+
+        function get_url(order) {
+            var url = "{% url 'submissions' contest.id %}";
+            var first = true;
+            var str = $("#filter-task").find(":selected").val()
+            if (str) {
+                url += `${first ? "?" : "&"}task=${str}`;
+                first = false;
+            }
+            str = $("#filter-language").find(":selected").val()
+            if (str) {
+                url += `${first ? "?" : "&"}language=${str}`;
+                first = false;
+            }
+            str = $("#filter-status").find(":selected").val()
+            if (str) {
+                url += `${first ? "?" : "&"}status=${str}`;
+                first = false;
+            }
+            if (order) {
+                url += `${first ? "?" : "&"}order=${order}`;
+                first = false;
+            }
+            return url;
+        }
+
+        $("#submit").click(function() {
+            window.location.href = get_url("{{ order }}");
+        });
+
+        $("#sort-date").click(function() {
+            const order = "{{ order }}";
+            if (order === "") {
+                window.location.href = get_url("BY_DATE_ASC");
+            } else if (order === "BY_DATE_ASC") {
+                window.location.href = get_url("BY_DATE_DESC");
+            } else {
+                window.location.href = get_url(null);
+            }
+        });
+
+        $("#sort-point").click(function() {
+            const order = "{{ order }}";
+            if (order === "BY_POINT_ASC") {
+                window.location.href = get_url("BY_POINT_DESC");
+            } else if (order === "BY_POINT_DESC") {
+                window.location.href = get_url(null);
+            } else {
+                window.location.href = get_url("BY_POINT_ASC");
+            }
+        });
+
+        $("#sort-time").click(function() {
+            const order = "{{ order }}";
+            if (order === "BY_TIME_ASC") {
+                window.location.href = get_url("BY_TIME_DESC");
+            } else if (order === "BY_TIME_DESC") {
+                window.location.href = get_url(null);
+            } else {
+                window.location.href = get_url("BY_TIME_ASC");
+            }
+        });
+
+        $("#sort-memory").click(function() {
+            const order = "{{ order }}";
+            if (order === "BY_MEMORY_ASC") {
+                window.location.href = get_url("BY_MEMORY_DESC");
+            } else if (order === "BY_MEMORY_DESC") {
+                window.location.href = get_url(null);
+            } else {
+                window.location.href = get_url("BY_MEMORY_ASC");
+            }
+        });
+    });
+  </script>
 {% endblock %}

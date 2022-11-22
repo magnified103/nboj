@@ -31,10 +31,27 @@
           <div class="card-body">
             <p>Time limit: {{ task.time_limit }}s</p>
             <p>Memory limit: {% widthratio task.memory_limit 1024 1 %} MiB</p>
-            <p><a href="{% url 'submit_task' task.id %}">Submit to this task.</a></p>
-            <p><a href="">Your submissions for this task.</a></p>
+            <p><a href="{% url 'submit' contest.id %}?task={{ task.index }}">Submit to this task.</a></p>
+            <p><a href="{% url 'submissions' contest.id %}?task={{ task.index }}">Your submissions for this task.</a></p>
           </div>
         </div>
+        {% if attachments %}
+          <div class="card">
+            <div class="card-header">
+              <h1 class="card-title">Attachments</h1>
+            </div>
+            <div class="card-body">
+              <ul class="list-group">
+                {% for attachment in attachments %}
+                  <li class="list-group-item py-1" style="cursor: pointer" onclick="location.href='{% url 'attachment' task.id attachment.name %}'">
+                    <i class="{{ attachment.fontawesome_icon_class }}" style="margin-right: 1.5rem"></i>
+                    {{ attachment.name }}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>

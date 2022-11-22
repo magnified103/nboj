@@ -1,6 +1,7 @@
 from django.db import models
 
 from judge.models.contest import Contest
+from judge.models.language import Language
 
 
 class TaskData(models.Model):
@@ -16,6 +17,7 @@ class Task(models.Model):
     points = models.FloatField()
     time_limit = models.FloatField()
     memory_limit = models.PositiveIntegerField()
+    allowed_languages = models.ManyToManyField(Language)
 
     class Meta:
         constraints = [

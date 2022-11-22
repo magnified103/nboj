@@ -2,7 +2,6 @@ from urllib.parse import urljoin
 
 from django import forms
 from django.conf import settings
-from django.forms import ModelForm
 from django.forms.models import ModelChoiceIteratorValue
 from django.forms.utils import flatatt
 from django.templatetags.static import static
@@ -113,15 +112,16 @@ class TaskSelectWidget(forms.Select):
         return option
 
 
-class EditorForm(ModelForm):
+class EditorForm(forms.ModelForm):
 
-    def __init__(self, contest, selected_task=None, *args, **kwargs):
+    def __init__(self, queryset, initial=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['language'].queryset = Language.objects.all()
-        self.fields['task'].queryset = Task.objects.filter(contest=contest)
-        self.fields['task'].initial = selected_task
-        if selected_task is not None:
-            self.fields['task'].disabled = True
+        self.fields['task'].queryset = queryset
+        if initial is not None:
+            self.fields['task'].initial = initial
+        # if selected_task is not None:
+        #     self.fields['task'].disabled = True
 
     class Meta:
         model = Submission
@@ -139,3 +139,39 @@ class EditorForm(ModelForm):
                                                     'class': 'form-control select2bs4',
                                                     'style': 'width: 100%'}),
         }
+
+
+class SubmissionFilterForm(forms.Form):
+    task_filter = forms.ChoiceField(required=False)
+    language_filter = forms.ChoiceField(required=False)
+    status_filter = forms.ChoiceField(required=False)
+
+    def __init__(self, user, contest, initial_task=None, initial_language=None, initial_status=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['task_filter'].widget = forms.Select(attrs={
+            'id': 'filter-task',
+            'class': 'form-control input-sm w-100',
+        })
+        self.fields['task_filter'].choices = [('', '---------'), *list(Submission.objects.filter(
+            user=user,
+            task__contest=contest
+        ).values_list('task__index', 'task__name').distinct())]
+        self.fields['task_filter'].initial = initial_task
+        self.fields['language_filter'].widget = forms.Select(attrs={
+            'id': 'filter-language',
+            'class': 'form-control input-sm w-100',
+        })
+        self.fields['language_filter'].choices = [('', '---------'), *list(Submission.objects.filter(
+            user=user,
+            task__contest=contest
+        ).values_list('language__key', 'language__name').distinct())]
+        self.fields['language_filter'].initial = initial_language
+        self.fields['status_filter'].widget = forms.Select(attrs={
+            'id': 'filter-status',
+            'class': 'form-control input-sm w-100',
+        })
+        self.fields['status_filter'].choices = [('', '---------'), *list(Submission.objects.filter(
+            user=user,
+            task__contest=contest
+        ).values_list('result', 'result').distinct())]
+        self.fields['status_filter'].initial = initial_status

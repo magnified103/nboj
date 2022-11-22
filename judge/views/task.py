@@ -1,12 +1,13 @@
 from django.utils.functional import cached_property
 
 from django.utils.functional import cached_property
+from django.views.generic import TemplateView
 
-from judge.models import Task
-from judge.views.contest_base import ContestBaseView
+from judge.models import Task, Attachment
+from judge.views.contest_base import ContestMixin
 
 
-class TaskView(ContestBaseView):
+class TaskView(ContestMixin, TemplateView):
     template_name = 'judge/contest_task.html'
 
     @cached_property
@@ -29,4 +30,5 @@ class TaskView(ContestBaseView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['task'] = self.task
+        context['attachments'] = Attachment.objects.filter(task=self.task)
         return context

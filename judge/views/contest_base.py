@@ -1,13 +1,14 @@
 from datetime import datetime, timezone
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db import connection
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from judge.models import Contest, Participation, Task
 
 
-class ContestBaseView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class ContestMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     @cached_property
     def contest(self):
@@ -23,7 +24,12 @@ class ContestBaseView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
 
     def test_func(self):
         try:
-            return Participation.objects.filter(contest=self.contest, user=self.user).count() > 0
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT COUNT(*) FROM judge_participation '
+                               'WHERE (contest_id = %s AND user_id = %s)', [self.contest.id, self.user.id])
+                return cursor.fetchone()[0] > 0
+
+            # return Participation.objects.filter(contest=self.contest, user=self.user).count() > 0
         except Exception:
             return False
 
