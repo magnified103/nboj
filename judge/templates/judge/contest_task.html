@@ -8,7 +8,9 @@
   <div class="content">
     <div class="row">
       <div class="col-8">
-        <embed src="{% url 'attachment' task.id task.statement_file %}" type="application/pdf" height="800" style="width: 100%">
+        {% for statement_file in statement_files %}
+          <embed src="{% url 'attachment' task.id statement_file %}" type="application/pdf" height="800" style="width: 100%">
+        {% endfor %}
       </div>
       <div class="col-4">
         <div class="card">

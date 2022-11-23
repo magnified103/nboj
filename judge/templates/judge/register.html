@@ -1,0 +1,176 @@
+{% extends 'judge/auth_base.html' %}
+
+{% block body_class %}register-page{% endblock %}
+
+{% block content %}
+  <div class="register-box">
+    <div class="register-logo">
+      <b>Register</b>
+    </div>
+    <div class="card">
+      <div class="card-body register-card-body">
+        {% if form.non_field_errors %}
+          <div class="alert alert-warning alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5><i class="icon fa-solid fa-exclamation-triangle"></i></h5>
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+          </div>
+        {% endif %}
+
+        <form action="" method="post">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-12">
+              <label for="id_first_name">Name</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="input-group mb-3">
+                <input type="text" name="first_name" id="id_first_name" class="form-control {% if form.first_name.errors %} is-invalid {% endif %}" placeholder="First name">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+  {#                  <span class="fa-solid fa-user"></span>#}
+                  </div>
+                </div>
+                {% if form.first_name.errors %}
+                  <div class="error invalid-feedback">
+                    <ul class="mb-0">
+                      {% for error in form.first_name.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="input-group mb-3">
+                <label for="id_last_name" hidden>Name</label>
+                <input type="text" name="last_name" id="id_last_name" class="form-control {% if form.last_name.errors %} is-invalid {% endif %}" placeholder="Last name">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+  {#                  <span class="fa-solid fa-user"></span>#}
+                  </div>
+                </div>
+                {% if form.last_name.errors %}
+                  <div class="error invalid-feedback">
+                    <ul class="mb-0">
+                      {% for error in form.last_name.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <label for="id_email">Email address</label>
+              <div class="input-group mb-3">
+                <input type="email" name="email" id="id_email" class="form-control {% if form.email.errors %} is-invalid {% endif %}" placeholder="someone@example.com">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fa-solid fa-envelope"></span>
+                  </div>
+                </div>
+                {% if form.email.errors %}
+                  <div class="error invalid-feedback">
+                    <ul class="mb-0">
+                      {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <label for="id_username">Username</label>
+              <div class="input-group mb-3">
+                <input type="text" name="username" id="id_username" class="form-control {% if form.username.errors %} is-invalid {% endif %}" placeholder="">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fa-solid fa-user"></span>
+                  </div>
+                </div>
+                {% if form.username.errors %}
+                  <div class="error invalid-feedback">
+                    <ul class="mb-0">
+                      {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <label for="id_password1">Password</label>
+              <div class="input-group mb-3">
+                <input type="password" name="password1" id="id_password1" class="form-control {% if form.password1.errors %} is-invalid {% endif %}" placeholder="">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fa-solid fa-key"></span>
+                  </div>
+                </div>
+                {% if form.password1.errors %}
+                  <div class="error invalid-feedback">
+                    <ul class="mb-0">
+                      {% for error in form.password1.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <label for="id_password2">Confirm password</label>
+              <div class="input-group mb-3">
+                <input type="password" name="password2" id="id_password2" class="form-control {% if form.password2.errors %} is-invalid {% endif %}" placeholder="">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fa-solid fa-key"></span>
+                  </div>
+                </div>
+                {% if form.password2.errors %}
+                  <div class="error invalid-feedback">
+                    <ul class="mb-0">
+                      {% for error in form.password2.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+            </div>
+            <!-- /.col -->
+          </div>
+        </form>
+{#        <p class="mb-1">#}
+{#          <a href="/examples-recover-password.html">I forgot my password</a>#}
+{#        </p>#}
+        <p class="mb-0 mt-2">
+          Have an account? <a href="{% url 'login' %}" class="text-center">Sign in</a>
+        </p>
+      </div>
+      <!-- /.login-card-body -->
+    </div>
+
+  </div>
+{% endblock %}

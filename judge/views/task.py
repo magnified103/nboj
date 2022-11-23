@@ -30,5 +30,8 @@ class TaskView(ContestMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['task'] = self.task
+        context['statement_files'] = list(Attachment.objects.filter(
+            task=self.task, is_statement_file=True
+        ).values_list('name', flat=True))
         context['attachments'] = Attachment.objects.filter(task=self.task)
         return context

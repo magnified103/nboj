@@ -1,42 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="{{ ASSETS_ROOT }}/favicon.ico" type="image/x-icon">
+{% extends 'judge/auth_base.html' %}
 
-  <title>
-    {% block title %}{% endblock %}
-  </title>
+{% block body_class %}login-page{% endblock %}
 
-  <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- Tempusdominus Bootstrap 4 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- iCheck -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/icheck-bootstrap/3.0.1/icheck-bootstrap.min.css" integrity="sha512-8vq2g5nHE062j3xor4XxPeZiPjmRDh6wlufQlfC6pdQ/9urJkU07NM0tEREeymP++NczacJ/Q59ul+/K2eYvcg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- JQVMap -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/jqvmap.min.css" integrity="sha512-RPxGl20NcAUAq1+Tfj8VjurpvkZaep2DeCgOfQ6afXSEgcvrLE6XxDG2aacvwjdyheM/bkwaLVc7kk82+mafkQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Theme style -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.2.0/css/adminlte.min.css" integrity="sha512-IuO+tczf4J43RzbCMEFggCWW5JuX78IrCJRFFBoQEXNvGI6gkUw4OjuwMidiS4Lm9Q2lILzpJwZuMWuSEeT9UQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- overlayScrollbars -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.13.3/css/OverlayScrollbars.min.css" integrity="sha512-Xd88BFhCPQY5aAt2W3F5FmTVKkubVsAZDJBo7aXPRc5mwIPTEJvNeqbvBWfNKd4IEu3v9ots+nTdsTzVynlaOw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Daterange picker -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.css" integrity="sha512-gp+RQIipEa1X7Sq1vYXnuOW96C4704yI1n0YB9T/KqdvqaEgL6nAuTSrKufUX3VBONq/TPuKiXGLVgBKicZ0KA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- summernote -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs4.min.css" integrity="sha512-ngQ4IGzHQ3s/Hh8kMyG4FC74wzitukRMIcTOoKT3EyzFZCILOPF0twiXOQn75eDINUfKBYmzYn2AA8DkAk8veQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  {% block stylesheets %}{% endblock stylesheets %}
-
-</head>
-<body class="hold-transition login-page">
+{% block content %}
   <div class="login-box">
     <div class="login-logo">
-      <b>Login portal</b>
+      <b>Login</b>
     </div>
     <div class="card">
       <div class="card-body login-card-body">
@@ -61,9 +30,14 @@
               </div>
             </div>
             {% if form.username.errors %}
-              <span class="error invalid-feedback">
-                {{ form.username.errors }}
-              </span>
+              <div class="error invalid-feedback">
+                <ul class="mb-0">
+                  {% for error in form.username.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+{#                {{ form.username.errors }}#}
+              </div>
             {% endif %}
           </div>
           <div class="input-group mb-3">
@@ -75,9 +49,14 @@
               </div>
             </div>
             {% if form.password.errors %}
-              <span class="error invalid-feedback">
-                {{ form.password.errors }}
-              </span>
+              <div class="error invalid-feedback">
+                <ul class="mb-0">
+                  {% for error in form.password.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+{#                {{ form.password.errors }}#}
+              </div>
             {% endif %}
           </div>
           <div class="row">
@@ -90,20 +69,12 @@
 {#        <p class="mb-1">#}
 {#          <a href="/examples-recover-password.html">I forgot my password</a>#}
 {#        </p>#}
-{#        <p class="mb-0">#}
-{#          <a href="/examples-register.html" class="text-center">Register a new membership</a>#}
-{#        </p>#}
+        <p class="mb-0 mt-2">
+          Not registered? <a href="{% url 'register' %}" class="text-center">Create an account</a>
+        </p>
       </div>
       <!-- /.login-card-body -->
     </div>
 
   </div>
-
-
-{% include 'judge/scripts.html' %}
-
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
-
-</body>
-</html>
+{% endblock %}

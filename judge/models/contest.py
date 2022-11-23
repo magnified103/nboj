@@ -9,6 +9,9 @@ class Contest(models.Model):
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
 
+    def __str__(self):
+        return self.name
+
     def is_ongoing(self):
         time = datetime.now(tz=timezone.utc)
         return ((self.start_time is None or self.start_time <= time)
