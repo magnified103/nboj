@@ -23,7 +23,7 @@
           {% csrf_token %}
           <div class="row">
             <div class="col-12">
-              <label for="id_first_name">Name</label>
+              <label for="id_first_name" hidden>Name</label>
             </div>
           </div>
           <div class="row">
@@ -69,9 +69,9 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <label for="id_email">Email address</label>
+              <label for="id_email" hidden>Email address</label>
               <div class="input-group mb-3">
-                <input type="email" name="email" id="id_email" class="form-control {% if form.email.errors %} is-invalid {% endif %}" placeholder="someone@example.com">
+                <input type="email" name="email" id="id_email" class="form-control {% if form.email.errors %} is-invalid {% endif %}" placeholder="Email">
                 <div class="input-group-append">
                   <div class="input-group-text">
                     <span class="fa-solid fa-envelope"></span>
@@ -91,9 +91,9 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <label for="id_username">Username</label>
+              <label for="id_username" hidden>Username</label>
               <div class="input-group mb-3">
-                <input type="text" name="username" id="id_username" class="form-control {% if form.username.errors %} is-invalid {% endif %}" placeholder="">
+                <input type="text" name="username" id="id_username" class="form-control {% if form.username.errors %} is-invalid {% endif %}" placeholder="Username">
                 <div class="input-group-append">
                   <div class="input-group-text">
                     <span class="fa-solid fa-user"></span>
@@ -113,9 +113,9 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <label for="id_password1">Password</label>
+              <label for="id_password1" hidden>Password</label>
               <div class="input-group mb-3">
-                <input type="password" name="password1" id="id_password1" class="form-control {% if form.password1.errors %} is-invalid {% endif %}" placeholder="">
+                <input type="password" name="password1" id="id_password1" class="form-control {% if form.password1.errors %} is-invalid {% endif %}" placeholder="Password">
                 <div class="input-group-append">
                   <div class="input-group-text">
                     <span class="fa-solid fa-key"></span>
@@ -135,9 +135,9 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <label for="id_password2">Confirm password</label>
+              <label for="id_password2" hidden>Confirm password</label>
               <div class="input-group mb-3">
-                <input type="password" name="password2" id="id_password2" class="form-control {% if form.password2.errors %} is-invalid {% endif %}" placeholder="">
+                <input type="password" name="password2" id="id_password2" class="form-control {% if form.password2.errors %} is-invalid {% endif %}" placeholder="Confirm password">
                 <div class="input-group-append">
                   <div class="input-group-text">
                     <span class="fa-solid fa-key"></span>

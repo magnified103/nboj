@@ -1,4 +1,6 @@
+from django.core.validators import URLValidator
 from django.db import models
+from django.forms.fields import URLField as FormURLField
 
 from judge.models.contest import Contest
 from judge.models.task import Task
@@ -9,7 +11,7 @@ class Attachment(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     is_statement_file = models.BooleanField(default=False)
-    path = models.URLField()
+    path = models.CharField(max_length=255)
     fontawesome_icon_class = models.CharField(max_length=255, default='fa-solid fa-file')
 
     def __str__(self):

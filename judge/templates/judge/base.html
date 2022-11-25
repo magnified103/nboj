@@ -49,6 +49,25 @@
 
     {% block navbar %}{% endblock %}
 
+    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="navbarCollapse" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav ml-auto">
+            <li class="nav-item dropdown user-menu">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                  <i class="fa-solid fa-user fa-lg"></i>
+                  <span>{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a href="#" class="dropdown-item">Settings</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
   </nav>
   <!-- /.navbar -->
 

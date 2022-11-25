@@ -21,13 +21,21 @@ class SubmitView(ContestMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         if 'contest_id' in self.kwargs:
-            kwargs['queryset'] = Task.objects.filter(contest=self.contest)
+            kwargs['task'] = Task.objects.filter(contest=self.contest)
             if 'task' in self.request.GET:
-                kwargs['initial'] = Task.objects.get(contest=self.contest, index=self.request.GET['task'])
+                kwargs['initial_task'] = Task.objects.get(contest=self.contest, index=self.request.GET['task'])
+                kwargs['language'] = Task.objects.get(
+                    contest=self.contest, index=self.request.GET['task']
+                ).allowed_languages
+            else:
+                kwargs['language'] = Language.objects.all()
         else:
             task_id = self.kwargs['task_id']
-            kwargs['initial'] = Task.objects.get(contest=self.contest, id=task_id)
-            kwargs['queryset'] = Task.objects.filter(contest=self.contest, id=task_id)
+            kwargs['initial_task'] = Task.objects.get(contest=self.contest, id=task_id)
+            kwargs['task'] = Task.objects.filter(contest=self.contest, id=task_id)
+            kwargs['language'] = Task.objects.get(
+                contest=self.contest, id=task_id
+            ).allowed_languages.all()
 
         return kwargs
 

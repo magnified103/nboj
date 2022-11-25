@@ -1,7 +1,7 @@
 from django.urls import path
 
 from judge.views import AttachmentView, DashboardView, ContestView, LoginView, LogoutView, RankingView, RegisterView
-from judge.views import SubmissionListView
+from judge.views import SubmissionListView, SubmissionView
 from judge.views import SubmitView, TaskView, TestView
 
 urlpatterns = [
@@ -16,6 +16,7 @@ urlpatterns = [
     path('contest/<int:contest_id>/submit/', SubmitView.as_view(), name='submit'),
     path('contest/<int:contest_id>/submissions/', SubmissionListView.as_view(), name='submissions'),
     path('contest/<int:contest_id>/ranking', RankingView.as_view(), name='ranking'),
+    path('contest/<int:contest_id>/submission/<int:submission_id>/', SubmissionView.as_view(), name='submission'),
     path('', DashboardView.as_view(), name='dashboard'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('test', TestView.as_view(), name='test')

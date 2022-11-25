@@ -1,0 +1,149 @@
+{% extends 'judge/contest_base.html' %}
+
+{% block content %}
+  <div class="content-header">
+    <h1 class="text-dark">Submission of <a href="{% url 'contest_task' contest.id submission.task.index %}">{{ submission.task.name }}</a></h1>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-body p-1">
+        <table class="table table-striped table-bordered table-hover">
+          <thead>
+            <tr>
+              <th class="align-middle text-center" style="width: 8%">#</th>
+              <th class="align-middle text-center" style="width: 12%">
+                <span role="button" id="sort-date">When<i class="fa-solid ml-2"></i></span>
+              </th>
+              <th class="align-middle" style="width: 30%">Task</th>
+              <th class="align-middle text-center" style="width: 10%">Language</th>
+              <th class="align-middle text-center" style="width: 10%">
+                <span role="button" id="sort-point">Points<i class="fa-solid ml-2"></i></span>
+              </th>
+              <th class="align-middle text-center" style="width: 10%">Status</th>
+              <th class="align-middle text-center" style="width: 10%">
+                <span role="button" id="sort-time">Time<i class="fa-solid ml-2"></i></span>
+              </th>
+              <th class="align-middle text-center" style="width: 10%">
+                <span role="button" id="sort-memory">Memory<i class="fa-solid ml-2"></i></span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="align-middle text-center">{{ submission.id }}</td>
+              <td class="align-middle text-center">{{ submission.date | date:'M\/d\/Y H\:i\:s' }}</td>
+              <td class="align-middle"><a href="{% url 'contest_task' submission.task.contest.id submission.task.index %}">{{ submission.task.name }}</a></td>
+              <td class="align-middle text-center">{{ submission.language.name }}</td>
+              <td class="align-middle text-center">{{ submission.points | floatformat }}</td>
+              <td class="align-middle text-center">
+                <h5>
+                  {% if submission.status in submission_status_processing %}
+                    <div class="spinner-border" role="status">
+                      <span class="sr-only">Running</span>
+                    </div>
+                  {% elif submission.status == 'CE' %}
+                    <span class="badge badge-warning">CE</span>
+                  {% elif submission.status != 'D' %}
+                    <span class="badge badge-danger">IE</span>
+                  {% else %}
+                    {% if submission.result == 'AC' %}
+                      <span class="badge badge-success">AC</span>
+                    {% elif submission.result in submission_status_error %}
+                      <span class="badge badge-danger">{{ submission.result }}</span>
+                    {% else %}
+                      <span class="badge badge-warning">{{ submission.result }}</span>
+                    {% endif %}
+                  {% endif %}
+                </h5>
+              </td>
+              <!-- hack from https://stackoverflow.com/a/6285428 -->
+              <td class="align-middle text-center">{% widthratio submission.time 1 1000 %} ms</td>
+              <td class="align-middle text-center">{{ submission.memory | floatformat:'0' }} KiB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% if error %}
+      {% if submission.status == 'CE' %}
+        <div class="callout callout-danger">
+          <h4>Compilation error</h4>
+          {{ error | safe }}
+        </div>
+      {% else %}
+        <div class="callout callout-warning">
+          <h4>Compilation warnings:</h4>
+          {{ error | safe }}
+        </div>
+      {% endif %}
+    {% endif %}
+    <div class="card collapsed-card">
+      <div class="card-header btn btn-link" role="button" data-card-widget="collapse">
+        <div class="card-title">
+          <i class="fa-solid fa-caret-down"></i>
+          Results
+        </div>
+      </div>
+
+      <div class="card-body">
+{#        {{ cases }}#}
+        <table class="table table-sm table-borderless w-auto">
+          <tr class="d-none">
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+          {% for element in cases %}
+            <tr>
+            {% if element.batched %}
+              <td colspan="4">
+                <p class="mb-0"><b>Batch #{{ element.batch_id }}:</b> ({{ element.points }}/{{ element.total }})</p>
+                <table class="table table-sm table-borderless w-auto mb-0">
+                {% for case in element.cases %}
+                  <tr>
+                    <td class="py-0">Case #{{ case.id }}:</td>
+                    {% with st=case.status %}
+                      <td class="py-0 font-weight-bold {% if st == 'AC' %}text-success{% elif st == 'WA' %}text-danger{% elif st == 'AB' or st == 'SC' or st == 'TLE' %}text-secondary{% else %}text-warning{% endif %}">{{ case.status }}</td>
+                    {% endwith %}
+                    <td class="py-0">[{% widthratio case.time 1 1000 %}ms, {{ case.memory | floatformat:'0' }}KiB]</td>
+                  </tr>
+                {% endfor %}
+                </table>
+              </td>
+            {% else %}
+              {% with case=element %}
+                <td><b>Test case #{{ case.id }}:</b></td>
+                {% with st=case.status %}
+                  <td class="font-weight-bold {% if st == 'AC' %}text-success{% elif st == 'WA' %}text-danger{% elif st == 'AB' or st == 'SC' or st == 'TLE' %}text-secondary{% else %}text-warning{% endif %}">{{ case.status }}</td>
+                {% endwith %}
+                <td>[{% widthratio case.time 1 1000 %}ms, {{ case.memory | floatformat:'0' }}KiB]</td>
+                <td>({{ case.points }}/{{ case.total }})</td>
+              {% endwith %}
+            {% endif %}
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+    <div class="card collapsed-card">
+      <div class="card-header btn btn-link" role="button" data-card-widget="collapse">
+        <div class="card-title">
+          <i class="fa-solid fa-caret-down"></i>
+          Source code
+        </div>
+      </div>
+
+      <div class="card-body">
+        {{ source | safe }}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <style>
+    {{ source_style }}
+  </style>
+{% endblock %}

@@ -55,6 +55,8 @@ class JudgeHandler(ZlibPacketHandler):
         self._stop_ping = threading.Event()
         self._non_scaled_points = None
         self._non_scaled_total = None
+        self.cases = []
+        self.current_batch = {}
 
     # Acts like a property. Returns True if the corresponding judge is working.
     @property
@@ -184,6 +186,10 @@ class JudgeHandler(ZlibPacketHandler):
 
     def on_grading_begin(self, packet):
         logger.info('%s: Grading has begun on: %s', self.name, packet['submission-id'])
+        self.batch_id = None
+        self.in_batch = False
+        self.cases = []
+
         if Submission.objects.filter(id=packet['submission-id']).update(
                 status='G'):
             # SubmissionTestCase.objects.filter(submission_id=packet['submission-id']).delete()
@@ -200,7 +206,7 @@ class JudgeHandler(ZlibPacketHandler):
     def on_grading_end(self, packet):
         logger.info('%s: Grading has ended on: %s', self.name, packet['submission-id'])
         self._free_self(packet)
-        # self.batch_id = None
+        self.batch_id = None
         #
         try:
             submission = Submission.objects.get(id=packet['submission-id'])
@@ -256,6 +262,7 @@ class JudgeHandler(ZlibPacketHandler):
         )  # scale points
         # submission.result = status_codes[status]
         submission.result = status_codes[submission.internal_result]
+        submission.cases = self.cases
         submission.save()
         #
         # json_log.info(self._make_json_log(
@@ -307,7 +314,15 @@ class JudgeHandler(ZlibPacketHandler):
                                                log=packet['log'], finish=True, result='CE'))
 
     def on_compile_message(self, packet):
-        pass
+        logger.info('%s: Submission generated compiler messages: %s', self.name, packet['submission-id'])
+
+        if Submission.objects.filter(id=packet['submission-id']).update(error=packet['log']):
+            # event.post('sub_%s' % Submission.get_id_secret(packet['submission-id']), {'type': 'compile-message'})
+            json_log.info(self._make_json_log(packet, action='compile-message', log=packet['log']))
+        else:
+            logger.warning('Unknown submission: %s', packet['submission-id'])
+            json_log.error(self._make_json_log(packet, action='compile-message', info='unknown submission',
+                                               log=packet['log']))
 
     def on_batch_begin(self, packet):
         logger.info('%s: Batch began on: %s', self.name, packet['submission-id'])
@@ -315,6 +330,7 @@ class JudgeHandler(ZlibPacketHandler):
         if self.batch_id is None:
             self.batch_id = 0
         self.batch_id += 1
+        self.current_batch = {'batched': True, 'batch_id': self.batch_id, 'cases': []}
 
         json_log.info(self._make_json_log(packet, action='batch-begin', batch=self.batch_id))
 
@@ -332,6 +348,9 @@ class JudgeHandler(ZlibPacketHandler):
             logger.warning('Unknown submission: %s', id)
             json_log.error(self._make_json_log(packet, action='test-case', info='unknown submission'))
             return
+        self.current_batch['points'] = self._non_scaled_points
+        self.current_batch['total'] = self._non_scaled_total
+        self.cases.append(self.current_batch)
         self._non_scaled_points = None
         self._non_scaled_total = None
         logger.info('%s: Batch ended on: %s', self.name, packet['submission-id'])
@@ -387,7 +406,9 @@ class JudgeHandler(ZlibPacketHandler):
             # test_case.extended_feedback = result.get('extended-feedback') or ''
             # test_case.output = result['output']
             # bulk_test_case_updates.append(test_case)
+            case = {'id': result['position']}
             if self.in_batch:
+                case['batched'] = True
                 if self._non_scaled_points is None:
                     self._non_scaled_points = result['points']
                 else:
@@ -397,10 +418,17 @@ class JudgeHandler(ZlibPacketHandler):
                 else:
                     self._non_scaled_total = max(self._non_scaled_total, result['total-points'])
             else:
+                case['batched'] = False
                 submission.non_scaled_points += result['points']
                 submission.non_scaled_total += result['total-points']
             submission.time = max(submission.time, result['time'])
             submission.memory = max(submission.memory, result['memory'])
+
+            case['points'] = result['points']
+            case['total'] = result['total-points']
+            case['time'] = result['time']
+            case['memory'] = result['memory']
+
             status = result['status']
             if status & 4:
                 status_index = 4
@@ -419,6 +447,12 @@ class JudgeHandler(ZlibPacketHandler):
             else:
                 status_index = 1
             submission.internal_result = max(submission.internal_result, status_index)
+            case['status'] = status_codes[status_index]
+
+            if self.in_batch:
+                self.current_batch['cases'].append(case)
+            else:
+                self.cases.append(case)
 
             # json_log.info(self._make_json_log(
             #     packet, action='test-case', case=test_case.case, batch=test_case.batch,

@@ -31,39 +31,39 @@
                 </tr>
               </thead>
               <tbody>
-                  {% for submission in submissions %}
-                    <tr>
-                      <td class="align-middle text-center">{{ submission.id }}</td>
-                      <td class="align-middle text-center">{{ submission.date | date:'M\/d\/Y H\:i\:s' }}</td>
-                      <td class="align-middle"><a href="{% url 'contest_task' submission.task.contest.id submission.task.index %}">{{ submission.task.name }}</a></td>
-                      <td class="align-middle text-center">{{ submission.language.name }}</td>
-                      <td class="align-middle text-center">{{ submission.points | floatformat }}</td>
-                      <td class="align-middle text-center">
-                        <h5>
-                          {% if submission.status in submission_status_processing %}
-                            <div class="spinner-border" role="status">
-                              <span class="sr-only">Running</span>
-                            </div>
-                          {% elif submission.status == 'CE' %}
-                            <span class="badge badge-warning">CE</span>
-                          {% elif submission.status != 'D' %}
-                            <span class="badge badge-danger">IE</span>
+                {% for submission in submissions %}
+                  <tr>
+                    <td class="align-middle text-center"><a href="{% url 'submission' contest.id submission.id %}">{{ submission.id }}</a></td>
+                    <td class="align-middle text-center">{{ submission.date | date:'M\/d\/Y H\:i\:s' }}</td>
+                    <td class="align-middle"><a href="{% url 'contest_task' submission.task.contest.id submission.task.index %}">{{ submission.task.name }}</a></td>
+                    <td class="align-middle text-center">{{ submission.language.name }}</td>
+                    <td class="align-middle text-center">{{ submission.points | floatformat }}</td>
+                    <td class="align-middle text-center">
+                      <h5>
+                        {% if submission.status in submission_status_processing %}
+                          <div class="spinner-border" role="status">
+                            <span class="sr-only">Running</span>
+                          </div>
+                        {% elif submission.status == 'CE' %}
+                          <span class="badge badge-warning">CE</span>
+                        {% elif submission.status != 'D' %}
+                          <span class="badge badge-danger">IE</span>
+                        {% else %}
+                          {% if submission.result == 'AC' %}
+                            <span class="badge badge-success">AC</span>
+                          {% elif submission.result in submission_status_error %}
+                            <span class="badge badge-danger">{{ submission.result }}</span>
                           {% else %}
-                            {% if submission.result == 'AC' %}
-                              <span class="badge badge-success">AC</span>
-                            {% elif submission.result in submission_status_error %}
-                              <span class="badge badge-danger">{{ submission.result }}</span>
-                            {% else %}
-                              <span class="badge badge-warning">{{ submission.result }}</span>
-                            {% endif %}
+                            <span class="badge badge-warning">{{ submission.result }}</span>
                           {% endif %}
-                        </h5>
-                      </td>
-                      <!-- hack from https://stackoverflow.com/a/6285428 -->
-                      <td class="align-middle text-center">{% widthratio submission.time 1 1000 %} ms</td>
-                      <td class="align-middle text-center">{{ submission.memory | floatformat:'0' }} KB</td>
-                    </tr>
-                  {% endfor %}
+                        {% endif %}
+                      </h5>
+                    </td>
+                    <!-- hack from https://stackoverflow.com/a/6285428 -->
+                    <td class="align-middle text-center">{% widthratio submission.time 1 1000 %} ms</td>
+                    <td class="align-middle text-center">{{ submission.memory | floatformat:'0' }} KiB</td>
+                  </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>

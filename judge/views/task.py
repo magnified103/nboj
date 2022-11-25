@@ -1,6 +1,4 @@
 from django.utils.functional import cached_property
-
-from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from judge.models import Task, Attachment

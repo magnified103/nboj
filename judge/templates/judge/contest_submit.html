@@ -2,7 +2,9 @@
 
 {% block content %}
   <div class="content-header">
-    <h1 class="text-dark">Submit</h1>
+    {% with initial_task=form.task.initial %}
+      <h1 class="text-dark">Submit{% if initial_task %} to <a href="{% url 'contest_task' contest.id initial_task.index %}">{{ initial_task.name }}</a>{% endif %}</h1>
+    {% endwith %}
   </div>
   <div class="content">
     <form action="" method="post">
@@ -12,32 +14,46 @@
           <div class="row">
             <div class="col-8">
               <div class="form-group">
-                <label>Source</label>
-                {{ form.source }}
+                <label for="id_source">{{ form.source.label }}</label>
+                <div class="{% if form.source.errors %}is-invalid{% endif %}">
+                  {{ form.source }}
+                </div>
                 {% if form.source.errors %}
-                  {% for error in form.source.errors %}
-                    <span class="error">{{ error }}</span>
-                  {% endfor %}
+                  <div class="invalid-feedback">
+                    <ul>
+                      {% for error in form.source.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
                 {% endif %}
               </div>
             </div>
             <div class="col-4">
               <div class="form-group">
-                <label>Task</label>
+                <label for="id_task">{{ form.task.label }}</label>
                 {{ form.task }}
                 {% if form.task.errors %}
-                  {% for error in form.task.errors %}
-                    <span class="error">{{ error }}</span>
-                  {% endfor %}
+                  <div class="invalid-feedback">
+                    <ul>
+                      {% for error in form.task.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
                 {% endif %}
               </div>
               <div class="form-group">
-                <label>Language</label>
+                <label for="id_language">{{ form.language.label }}</label>
                 {{ form.language }}
                 {% if form.language.errors %}
-                  {% for error in form.language.errors %}
-                    <span class="error">{{ error }}</span>
-                  {% endfor %}
+                  <div class="invalid-feedback">
+                    <ul>
+                      {% for error in form.language.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
                 {% endif %}
               </div>
               <div class="form-group">

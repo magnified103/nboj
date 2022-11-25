@@ -2,19 +2,22 @@ from urllib.parse import urljoin
 
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.forms.models import ModelChoiceIteratorValue
 from django.forms.utils import flatatt
 from django.templatetags.static import static
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext as _
 from django_ace import AceWidget
 
 from judge.models import Language, Submission
 
 
 class CodeWidget(AceWidget):
-    def __init__(self, id=None, *args, **kwargs):
+    def __init__(self, id=None, use_required_attribute=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.id = id
+        self._use_required_attribute = use_required_attribute
 
     @property
     def media(self):
@@ -76,6 +79,9 @@ class CodeWidget(AceWidget):
         html = '<div class="django-ace-editor">{}</div>'.format(html)
         return mark_safe(html)
 
+    def use_required_attribute(self, initial):
+        return super().use_required_attribute(initial) and self._use_required_attribute
+
 
 class LanguageSelectWidget(forms.Select):
     def __init__(self, attrs=None, choices=()):
@@ -114,14 +120,40 @@ class TaskSelectWidget(forms.Select):
 
 class EditorForm(forms.ModelForm):
 
-    def __init__(self, queryset, initial=None, *args, **kwargs):
+    def __init__(self, task, language, initial_task=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['language'].queryset = Language.objects.all()
-        self.fields['task'].queryset = queryset
-        if initial is not None:
-            self.fields['task'].initial = initial
+        self.fields['language'].queryset = language
+        self.fields['task'].queryset = task
+        if initial_task is not None:
+            self.fields['task'].initial = initial_task
+            self.fields['task'].disabled = True
         # if selected_task is not None:
         #     self.fields['task'].disabled = True
+
+        if 'task' in self.errors:
+            classes = self.fields['task'].widget.attrs.get('class', '')
+            classes += ' is-invalid'
+            self.fields['task'].widget.attrs['class'] = classes
+
+        if 'language' in self.errors:
+            classes = self.fields['language'].widget.attrs.get('class', '')
+            classes += ' is-invalid'
+            self.fields['language'].widget.attrs['class'] = classes
+
+    def clean(self):
+        cleaned_data = super().clean()
+        task = cleaned_data.get('task')
+        language = cleaned_data.get('language')
+
+        if task and language and not task.allowed_languages.filter(id=language.id).exists():
+            self.add_error('language', ValidationError(
+                _('Allowed language for %(task)s: [%(languages)s]'),
+                params={
+                    'task': task.name,
+                    'languages': ', '.join(list(task.allowed_languages.all().values_list('name', flat=True))),
+                },
+                code='invalid'
+            ))
 
     class Meta:
         model = Submission
@@ -132,10 +164,14 @@ class EditorForm(forms.ModelForm):
             'language': forms.ModelChoiceField,
         }
         widgets = {
-            'source': CodeWidget(id='ace_source', width='100%', showprintmargin=False),
-            'task': TaskSelectWidget(attrs={'class': 'form-control select2bs4',
-                                            'style': 'width: 100%'}),
-            'language': LanguageSelectWidget(attrs={'id': 'id_language',
-                                                    'class': 'form-control select2bs4',
-                                                    'style': 'width: 100%'}),
+            'source': CodeWidget(id='ace_source', use_required_attribute=False, width='100%', showprintmargin=False),
+            'task': TaskSelectWidget(attrs={
+                'class': 'form-control select2bs4',
+                'style': 'width: 100%',
+            }),
+            'language': LanguageSelectWidget(attrs={
+                'id': 'id_language',
+                'class': 'form-control select2bs4',
+                'style': 'width: 100%',
+            }),
         }
