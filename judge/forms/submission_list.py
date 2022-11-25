@@ -1,6 +1,6 @@
 from django import forms
 
-from judge.models import Submission
+from judge.models import Submission, Task
 
 
 class SubmissionFilterForm(forms.Form):
@@ -14,10 +14,13 @@ class SubmissionFilterForm(forms.Form):
             'id': 'filter-task',
             'class': 'form-control input-sm w-100',
         })
-        self.fields['task_filter'].choices = [('', '---------'), *list(Submission.objects.filter(
-            user=user,
-            task__contest=contest
-        ).values_list('task__index', 'task__name').distinct())]
+        # self.fields['task_filter'].choices = [('', '---------'), *list(Submission.objects.filter(
+        #     user=user,
+        #     task__contest=contest
+        # ).values_list('task__index', 'task__name').distinct())]
+        self.fields['task_filter'].choices = [('', '---------'), *list(Task.objects.filter(
+            contest=contest
+        ).values_list('index', 'name').distinct())]
         self.fields['task_filter'].initial = initial_task
         self.fields['language_filter'].widget = forms.Select(attrs={
             'id': 'filter-language',

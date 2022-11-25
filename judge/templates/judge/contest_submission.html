@@ -98,7 +98,7 @@
             <tr>
             {% if element.batched %}
               <td colspan="4">
-                <p class="mb-0"><b>Batch #{{ element.batch_id }}:</b> ({{ element.points }}/{{ element.total }})</p>
+                <p class="mb-0"><b>Batch #{{ element.batch_id }}:</b> ({{ element.points | floatformat }}/{{ element.total | floatformat }})</p>
                 <table class="table table-sm table-borderless w-auto mb-0">
                 {% for case in element.cases %}
                   <tr>
@@ -118,7 +118,7 @@
                   <td class="font-weight-bold {% if st == 'AC' %}text-success{% elif st == 'WA' %}text-danger{% elif st == 'AB' or st == 'SC' or st == 'TLE' %}text-secondary{% else %}text-warning{% endif %}">{{ case.status }}</td>
                 {% endwith %}
                 <td>[{% widthratio case.time 1 1000 %}ms, {{ case.memory | floatformat:'0' }}KiB]</td>
-                <td>({{ case.points }}/{{ case.total }})</td>
+                <td>({{ case.points | floatformat }}/{{ case.total | floatformat }})</td>
               {% endwith %}
             {% endif %}
             </tr>

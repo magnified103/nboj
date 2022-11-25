@@ -83,7 +83,7 @@ class JudgeHandler(ZlibPacketHandler):
         json_log.exception(self._make_json_log(sub=self._working, info='malformed json packet'))
 
     def on_packet(self, data):
-        logger.debug(f"Packet: {data}")
+        # logger.debug(f"Packet: {data}")
         try:
             try:
                 data = json.loads(data)
