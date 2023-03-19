@@ -3,9 +3,8 @@ from datetime import datetime, timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import connection
 from django.utils.functional import cached_property
-from django.views.generic import TemplateView
 
-from judge.models import Contest, Participation, Task
+from judge.models import Contest, Task
 
 
 class ContestMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -24,10 +23,11 @@ class ContestMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     def test_func(self):
         try:
+            time = datetime.now()
             with connection.cursor() as cursor:
                 cursor.execute('SELECT COUNT(*) FROM judge_participation '
                                'WHERE (contest_id = %s AND user_id = %s)', [self.contest.id, self.user.id])
-                return cursor.fetchone()[0] > 0
+                return cursor.fetchone()[0] > 0 and (self.contest.is_ongoing() or self.user.is_superuser)
 
             # return Participation.objects.filter(contest=self.contest, user=self.user).count() > 0
         except Exception:

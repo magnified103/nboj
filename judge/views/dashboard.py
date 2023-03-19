@@ -1,3 +1,4 @@
+import itertools
 import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -22,6 +23,8 @@ class DashboardView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         contest_ids = Participation.objects.filter(user=self.request.user).values_list('contest_id', flat=True)
+        # contest_ids = list(itertools.chain(*list(Participation.objects.raw('SELECT contest_id FROM judge_participation'
+        #                                                                    'WHERE user_id = %s', [self.request.user.id]))))
 
         ongoing = []
         upcoming = []

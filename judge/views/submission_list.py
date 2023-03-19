@@ -15,7 +15,7 @@ class SubmissionListView(ContestMixin, TemplateView):
 
         # context['submissions'] = Submission.objects.filter(user=self.user, task__contest=self.contest).order_by('-date')
         query = Submission.objects.filter(user=self.user, task__contest=self.contest)
-        # context['submissions'] = Submission.objects.raw('SELECT * FROM judge_submission INNER JOIN judge_task ON '
+        # query = Submission.objects.raw('SELECT * FROM judge_submission INNER JOIN judge_task ON '
         #                                                '(judge_submission.task_id = judge_task.id) WHERE '
         #                                                '(judge_task.contest_id = %s AND judge_submission.user_id = %s) '
         #                                                'ORDER BY judge_submission.date DESC',
